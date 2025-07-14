@@ -1,0 +1,20 @@
+# Node.js dependencies
+/node_modules
+
+# 환경변수 파일
+.env
+
+# 로그 파일
+*.log
+
+# 빌드 결과물 (예: dist, build 폴더)
+dist/
+build/
+
+# OS별 불필요 파일
+.DS_Store
+Thumbs.db
+
+# IDE 설정 폴더 (선택적)
+.vscode/
+.idea/
