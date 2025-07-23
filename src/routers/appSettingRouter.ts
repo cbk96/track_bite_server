@@ -48,5 +48,7 @@ export const appSettingRouter = (...args: any[]) => {
           ":" +
           nowSecond
       );
+
+      res.status(200).json({ ok: true });
     });
 };
