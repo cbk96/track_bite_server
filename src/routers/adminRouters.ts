@@ -176,6 +176,7 @@ export const adminRouter = (...args: any[]) => {
         const storeId = decoded.storeId;
         const role = decoded.role;
 
+        //토큰의 아이디 정보로 데이터베이스에서 회원 조회
         const result = await store.findOne(
           { storeId: storeId },
           { projection: { _id: 0 } }

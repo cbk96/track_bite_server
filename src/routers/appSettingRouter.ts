@@ -7,23 +7,46 @@ export const appSettingRouter = (...args: any[]) => {
   const router = Router();
   const publicId = "getAppInfo";
 
-  return router.get("/getAppSetting", async (req, res) => {
-    try {
-      const exists = await secureAppSetting.findOne(
-        { publicId },
-        { projection: { _id: 0 } }
-      );
+  return router
+    .get("/getAppSetting", async (req, res) => {
+      try {
+        const exists = await secureAppSetting.findOne(
+          { publicId },
+          { projection: { _id: 0 } }
+        );
 
-      if (exists) {
-        res.json({ ok: true, appInfo: exists });
-      } else {
-        res.json({
-          ok: false,
-          errorMsg: "앱 정보를 가져올 수 없습니다.",
-        });
+        if (exists) {
+          res.json({ ok: true, appInfo: exists });
+        } else {
+          res.json({
+            ok: false,
+            errorMsg: "앱 정보를 가져올 수 없습니다.",
+          });
+        }
+      } catch (e) {
+        if (e instanceof Error) res.json({ ok: false, errorMsg: e.message });
       }
-    } catch (e) {
-      if (e instanceof Error) res.json({ ok: false, errorMsg: e.message });
-    }
-  });
+    })
+    .get("/keep", async (req, res) => {
+      const date = new Date();
+      const nowYear = date.getFullYear();
+      const nowMonth = date.getMonth();
+      const nowDay = date.getDate();
+      const nowHours = date.getHours();
+      const nowMinutes = date.getMinutes();
+      const nowSecond = date.getSeconds();
+      console.log(
+        nowYear +
+          "-" +
+          nowMonth +
+          "-" +
+          nowDay +
+          " " +
+          nowHours +
+          ":" +
+          nowMinutes +
+          ":" +
+          nowSecond
+      );
+    });
 };
