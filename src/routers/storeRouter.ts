@@ -10,6 +10,9 @@ export const storeRouters = (...args: any[]) => {
   const purchase = db.collection("purchases");
   const router = Router();
 
+  const SEOUL_CODE = "11";
+  const GYEONGGIDO_CODE = "41";
+
   return router
     .get("/", async (req, res) => {
       const {
@@ -20,6 +23,7 @@ export const storeRouters = (...args: any[]) => {
         limit = "0",
       } = req.query;
       const stSigunguCode = String(sigunguCode);
+      const sigunguHeadCode = stSigunguCode.slice(0, 2);
       const stStoreName = String(storeName).replace(
         /[.*+?^${}()|[\]\\]/g,
         "\\$&"
@@ -27,11 +31,30 @@ export const storeRouters = (...args: any[]) => {
       const stCategory = String(category);
       try {
         const filter: any = {
-          "address.sigunguCode": {
-            $regex: "^" + stSigunguCode.slice(0, 2),
-          },
           storeName: { $regex: stStoreName, $options: "i" },
         };
+        console.log("sigungu code chk : ", sigunguHeadCode);
+        if (
+          sigunguHeadCode === SEOUL_CODE ||
+          sigunguHeadCode === GYEONGGIDO_CODE
+        ) {
+          filter["$or"] = [
+            {
+              "address.sigunguCode": {
+                $regex: "^" + SEOUL_CODE,
+              },
+            },
+            {
+              "address.sigunguCode": {
+                $regex: "^" + GYEONGGIDO_CODE,
+              },
+            },
+          ];
+        } else {
+          filter["address.sigunguCode"] = {
+            $regex: "^" + sigunguHeadCode,
+          };
+        }
 
         if (stCategory.trim() !== "empty" && stCategory.trim() !== "") {
           filter.category = stCategory;
@@ -58,18 +81,35 @@ export const storeRouters = (...args: any[]) => {
       try {
         const { prefer = "", sigunguCode = "" } = req.query;
         const stSigunguCode = String(sigunguCode);
+        const sigunguHeadCode = stSigunguCode.slice(0, 2);
         const stPrefer = String(prefer);
+
+        let matchStage: any;
+
+        if (
+          sigunguHeadCode === SEOUL_CODE ||
+          sigunguHeadCode === GYEONGGIDO_CODE
+        ) {
+          matchStage = {
+            $match: {
+              $or: [
+                { "address.sigunguCode": { $regex: "^" + SEOUL_CODE } },
+                { "address.sigunguCode": { $regex: "^" + GYEONGGIDO_CODE } },
+              ],
+            },
+          };
+        } else {
+          matchStage = {
+            $match: {
+              "address.sigunguCode": { $regex: "^" + sigunguHeadCode },
+            },
+          };
+        }
 
         const topStores = await purchase
           .aggregate([
             // 1. 시군구 코드로 필터링
-            {
-              $match: {
-                "address.sigunguCode": {
-                  $regex: "^" + stSigunguCode.slice(0, 2),
-                },
-              },
-            },
+            matchStage,
             // 2. purchasePackageId 기준으로 중복 제거
             {
               $group: {
@@ -117,13 +157,7 @@ export const storeRouters = (...args: any[]) => {
         const preferStores = await purchase
           .aggregate([
             // 1. 시군구 코드로 필터링
-            {
-              $match: {
-                "address.sigunguCode": {
-                  $regex: "^" + stSigunguCode.slice(0, 2),
-                },
-              },
-            },
+            matchStage,
             // 2. purchasePackageId 기준으로 중복 제거
             {
               $group: {
