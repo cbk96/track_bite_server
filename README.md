@@ -1,7 +1,7 @@
 # 🍔 TrackBite Backend
 
 배달 주문 플랫폼 TrackBite의 백엔드 레포지토리입니다.  
-Express.js와 MongoDB를 기반으로 RESTful API와 인증, 데이터 처리 기능을 제공합니다.  
+Node.js, Express.js와 MongoDB를 기반으로 RESTful API와 인증, 데이터 처리 기능을 제공합니다.  
 
 > 프론트엔드와 전체 기능 설명은 [프론트 리포지토리](https://github.com/cbk96/track_bite)에서 확인하실 수 있습니다.
 
